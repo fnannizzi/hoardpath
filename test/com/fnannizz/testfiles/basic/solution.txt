@@ -1,0 +1,5 @@
+4
+2 nothing
+3 knife
+3 nothing
+4 potted plant
