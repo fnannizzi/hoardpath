@@ -1,6 +1,7 @@
 package com.fnannizz;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by francesca on 11/25/16.
@@ -11,7 +12,7 @@ public class Room {
     private String name;
     private String id;
     private ArrayList<String> items;
-    private ArrayList<String> adjacentRooms;
+    private HashMap<String, String> adjacentRooms;
 
     public Room() {
         name = "DEAD END";
@@ -22,20 +23,19 @@ public class Room {
         id = i;
 
         items = new ArrayList<>();
-        adjacentRooms = new ArrayList<String>() {{
-            add("");
-            add("");
-            add("");
-            add("");
-        }};
+        adjacentRooms = new HashMap<>();
     }
 
     void addItemToRoom(String itemName) {
         items.add(itemName);
     }
 
-    void addConnectingRoom(Integer directionIndex, String roomId) {
-        adjacentRooms.set(directionIndex, roomId);
+    void addConnectingRoom(String direction, String roomId) {
+        adjacentRooms.put(direction, roomId);
+    }
+
+    HashMap<String, String> getAdjacentRooms() {
+        return adjacentRooms;
     }
 
     String getId() {

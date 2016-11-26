@@ -18,9 +18,23 @@ import java.util.*;
 **/
 
 class Path {
-    private ArrayList<Integer> path;
+    private ArrayList<String> path;
+    private boolean undefined;
 
-    public void addToPath(Integer node) {
+    Path() {
+        path = new ArrayList<>();
+        undefined = false;
+    }
+
+    public void setUndefined() {
+        undefined = true;
+    }
+
+    public boolean getUndefined() {
+        return undefined;
+    }
+
+    public void addToPath(String node) {
         path.add(node);
     }
 }
@@ -28,14 +42,14 @@ class Path {
 class RoomMap {
     private HashMap<String, Room> roomMap;
     private HashMap<String, String> itemLocationsMap;
-    static private HashMap<String, Integer> directionsMap;
+    static private HashSet<String> directions;
 
     RoomMap(String mapFilePath) {
-        directionsMap = new HashMap<String, Integer>() {{
-            put("north", 0);
-            put("east",  1);
-            put("south", 2);
-            put("west",  3);
+        directions = new HashSet<String>() {{
+            add("north");
+            add("east");
+            add("south");
+            add("west");
         }};
         itemLocationsMap = new HashMap<>();
         roomMap = new HashMap<>();
@@ -58,35 +72,11 @@ class RoomMap {
         return roomMap.size();
     }
 
-    public void findShortestPath(ArrayList<String> itemsToCollect, Integer startNode) throws InvalidScenarioException {
-        ArrayList<String> locationsOfNeededItems = getLocationsOfNeededItems(itemsToCollect);
-
-        // The number of must-visit nodes is the number of nodes containing objects we need, plus the start node if
-        // it isn't already in the list of must-visits
-        Integer numMustVisitNodes;
-        if (locationsOfNeededItems.contains(startNode)) {
-            numMustVisitNodes = locationsOfNeededItems.size();
-        }
-        else {
-            numMustVisitNodes = locationsOfNeededItems.size() + 1;
-        }
-
-        Path[][] shortestPaths = new Path[numMustVisitNodes][numMustVisitNodes];
-
-        for (int start = 0; start < numMustVisitNodes; start++) {
-            for (int end = 0; end < numMustVisitNodes; end++) {
-                if (start == end) {
-                    //shortestPaths[start][end] = ;
-                }
-            }
-        }
-
-
-
-
+    HashMap<String, Room> getRoomMap() {
+        return roomMap;
     }
 
-    private ArrayList<String> getLocationsOfNeededItems(ArrayList<String> itemsToCollect) throws InvalidScenarioException {
+    public ArrayList<String> getLocationsOfNeededItems(ArrayList<String> itemsToCollect) throws InvalidScenarioException {
         ArrayList<String> locationsOfNeededItems = new ArrayList<>();
         for (String item : itemsToCollect) {
             if (itemLocationsMap.containsKey(item)) {
@@ -97,6 +87,10 @@ class RoomMap {
             }
         }
         return locationsOfNeededItems;
+    }
+
+    public boolean nodeExistsInMap(String id) {
+        return roomMap.containsKey(id);
     }
 
     // TODO: decide if this should be moved to a separate class
@@ -122,9 +116,9 @@ class RoomMap {
                 }
 
                 // Add all connecting rooms
-                for (String direction : directionsMap.keySet()) {
+                for (String direction : directions) {
                     if (!Objects.equals(current.getAttribute(direction),"")) {
-                        newRoom.addConnectingRoom(new Integer(directionsMap.get(direction)), current.getAttribute(direction));
+                        newRoom.addConnectingRoom(direction, current.getAttribute(direction));
                     }
                 }
                 roomMap.put(newRoom.getId(), newRoom);

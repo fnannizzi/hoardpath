@@ -12,7 +12,7 @@ import java.util.Objects;
 class RouteSolver {
     private RoomMap map;
     private ArrayList<String> itemsToCollect;
-    private Integer startNode;
+    private String startNode;
 
     RouteSolver(String mapFilePath) {
         map = new RoomMap(mapFilePath);
@@ -29,14 +29,8 @@ class RouteSolver {
         try {
             BufferedReader in = new BufferedReader(new FileReader(scenarioFilePath));
             String str;
-            str = in.readLine();
-            if (str != null) {
-                startNode = Integer.parseInt(str);
-            }
-            else {
-                throw new InvalidScenarioException("Starting location not specified.");
-            }
-            if (startNode < 0 || startNode > map.getNumberOfRooms()) {
+            startNode = in.readLine();
+            if (startNode == null || !map.nodeExistsInMap(startNode)) {
                 throw new InvalidScenarioException("Starting location does not exist in map.");
             }
 
@@ -57,14 +51,8 @@ class RouteSolver {
         if (itemsToCollect.size() < 1) {
             throw new InvalidScenarioException("Please provide a list of items to collect before attempting to solve.");
         }
-
-        map.findShortestPath(itemsToCollect, startNode);
-
-        printSolution();
-    }
-
-    private void printSolution() {
-
+        ShortestPathSolver solver = new ShortestPathSolver(map);
+        solver.findShortestPath(itemsToCollect, startNode);
     }
 
     void printItemsToCollect() {
