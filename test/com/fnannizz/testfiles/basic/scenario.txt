@@ -1,7 +1,3 @@
-scullery
-Plate
-Fishing-rod
-Lamp
-Book
-Pickaxe
-Pine-cone
+2
+potted plant
+knife

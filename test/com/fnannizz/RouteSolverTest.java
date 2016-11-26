@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
  * Created by francesca on 11/25/16.
  */
 public class RouteSolverTest {
+
     private final String testfilesPath = "./test/com/fnannizz/testfiles/";
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
@@ -32,15 +33,22 @@ public class RouteSolverTest {
     }
 
     @Test
+    public void testSetScenario() throws Exception {
+        RouteSolver solver = new RouteSolver();
+        solver.setScenario(testfilesPath + "basic/scenario.txt");
+        solver.printItemsToCollect();
+        assertEquals("potted plant\nknife".trim(), outputStream.toString().trim());
+    }
+
+    @Test
     public void testSolvingBasicMap() throws Exception {
         RouteSolver solver = new RouteSolver();
         solver.setMap(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         String solution = readSolutionFile(testfilesPath + "basic/solution.txt");
-        System.out.println(solution);
         solver.solve();
 
-        assertEquals(solution, outputStream.toString());
+        assertEquals(solution.trim(), outputStream.toString().trim());
 
     }
 
