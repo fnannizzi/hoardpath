@@ -16,35 +16,12 @@ import java.util.*;
 /**
  * Created by francesca on 11/25/16.
 **/
-
-class Path {
-    private ArrayList<String> path;
-    private boolean undefined;
-
-    Path() {
-        path = new ArrayList<>();
-        undefined = false;
-    }
-
-    public void setUndefined() {
-        undefined = true;
-    }
-
-    public boolean getUndefined() {
-        return undefined;
-    }
-
-    public void addToPath(String node) {
-        path.add(node);
-    }
-}
-
-class RoomMap {
+class RoomGraph {
     private HashMap<String, Room> roomMap;
     private HashMap<String, String> itemLocationsMap;
     static private HashSet<String> directions;
 
-    RoomMap(String mapFilePath) {
+    RoomGraph(String mapFilePath) {
         directions = new HashSet<String>() {{
             add("north");
             add("east");
@@ -63,20 +40,12 @@ class RoomMap {
         }
     }
 
-    // Called only when asked to reset the scenario
-    void clearItemLocations() {
-        itemLocationsMap.clear();
-    }
-
-    Integer getNumberOfRooms() {
-        return roomMap.size();
-    }
-
     HashMap<String, Room> getRoomMap() {
         return roomMap;
     }
 
-    public ArrayList<String> getLocationsOfNeededItems(ArrayList<String> itemsToCollect) throws InvalidScenarioException {
+    // Using the list of known item locations, build a list of locations we need to visit in order to collect all items.
+    ArrayList<String> getLocationsOfNeededItems(ArrayList<String> itemsToCollect) throws InvalidScenarioException {
         ArrayList<String> locationsOfNeededItems = new ArrayList<>();
         for (String item : itemsToCollect) {
             if (itemLocationsMap.containsKey(item)) {
@@ -89,7 +58,7 @@ class RoomMap {
         return locationsOfNeededItems;
     }
 
-    public boolean nodeExistsInMap(String id) {
+    boolean nodeExistsInMap(String id) {
         return roomMap.containsKey(id);
     }
 
@@ -124,6 +93,11 @@ class RoomMap {
                 roomMap.put(newRoom.getId(), newRoom);
             }
         }
+    }
+
+    // Called only when asked to reset the scenario
+    void clearItemLocations() {
+        itemLocationsMap.clear();
     }
 
     void printMap() {

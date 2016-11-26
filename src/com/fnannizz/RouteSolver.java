@@ -4,34 +4,33 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Objects;
 
 /**
  * Created by francesca on 11/25/16.
  */
 class RouteSolver {
-    private RoomMap map;
+    private RoomGraph roomGraph;
     private ArrayList<String> itemsToCollect;
-    private String startNode;
+    private String startingLocation;
 
     RouteSolver(String mapFilePath) {
-        map = new RoomMap(mapFilePath);
+        roomGraph = new RoomGraph(mapFilePath);
         itemsToCollect = new ArrayList<>();
     }
 
     void setScenario(String scenarioFilePath) throws InvalidScenarioException {
-        // Allow the map to be reused with multiple scenarios
+        // Allow the roomGraph to be reused with multiple scenarios
         if (itemsToCollect.size() > 0) {
             itemsToCollect.clear();
-            map.clearItemLocations();
+            roomGraph.clearItemLocations();
         }
 
         try {
             BufferedReader in = new BufferedReader(new FileReader(scenarioFilePath));
             String str;
-            startNode = in.readLine();
-            if (startNode == null || !map.nodeExistsInMap(startNode)) {
-                throw new InvalidScenarioException("Starting location does not exist in map.");
+            startingLocation = in.readLine();
+            if (startingLocation == null || !roomGraph.nodeExistsInMap(startingLocation)) {
+                throw new InvalidScenarioException("Starting location does not exist in roomGraph.");
             }
 
             while ((str = in.readLine()) != null) {
@@ -51,8 +50,8 @@ class RouteSolver {
         if (itemsToCollect.size() < 1) {
             throw new InvalidScenarioException("Please provide a list of items to collect before attempting to solve.");
         }
-        ShortestPathSolver solver = new ShortestPathSolver(map);
-        solver.findShortestPath(itemsToCollect, startNode);
+        ShortestPathSolver solver = new ShortestPathSolver(roomGraph);
+        solver.findShortestPath(itemsToCollect, startingLocation);
     }
 
     void printItemsToCollect() {
@@ -62,6 +61,6 @@ class RouteSolver {
     }
 
     void printMap() {
-        map.printMap();
+        roomGraph.printMap();
     }
 }

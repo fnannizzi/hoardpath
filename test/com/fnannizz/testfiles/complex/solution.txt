@@ -1,0 +1,52 @@
+Found an optimal path of length 21.
+-------------------------------------------------
+Entering scullery.
+Moving west.
+Entering kitchen.
+Moving north.
+Entering dining-room.
+Picking up plate.
+Moving north.
+Entering hallway.
+Moving east.
+Entering library.
+Picking up book.
+Moving south.
+Entering secret-passage-west.
+Moving east.
+Entering secret-passage-east.
+Moving south.
+Entering huge-cavern.
+Moving east.
+Entering narrow-crawl.
+Moving north.
+Entering underground-lake.
+Picking up lamp.
+Moving south.
+Entering narrow-crawl.
+Moving west.
+Entering huge-cavern.
+Moving north.
+Entering secret-passage-east.
+Moving north.
+Entering cave-entrance.
+Moving east.
+Entering low-tunnel.
+Picking up pickaxe.
+Moving west.
+Entering cave-entrance.
+Moving north.
+Entering scree-slope.
+Moving east.
+Entering pine-forest.
+Picking up pine-cone.
+Moving north.
+Entering foothills.
+Moving west.
+Entering mesa.
+Moving west.
+Entering dirt-track.
+Moving west.
+Entering pond.
+Picking up fishing-rod.
+All items collected.

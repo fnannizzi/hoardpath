@@ -1,5 +1,12 @@
-4
-2 nothing
-3 knife
-2 nothing
-4 potted plant
+Found an optimal path of length 3.
+-------------------------------------------------
+Entering 2.
+Moving east.
+Entering 4.
+Picking up potted plant.
+Moving west.
+Entering 2.
+Moving west.
+Entering 3.
+Picking up knife.
+All items collected.

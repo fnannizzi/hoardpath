@@ -7,7 +7,6 @@ import java.util.HashMap;
  * Created by francesca on 11/25/16.
  */
 public class Room {
-    private static final int NUM_CONNECTIONS = 4;
 
     private String name;
     private String id;
@@ -23,15 +22,32 @@ public class Room {
     }
 
     void addItemToRoom(String itemName) {
-        items.add(itemName);
+        items.add(itemName.toLowerCase());
     }
 
     void addConnectingRoom(String direction, String roomId) {
-        adjacentRooms.put(direction, roomId);
+        adjacentRooms.put(roomId, direction);
     }
 
     HashMap<String, String> getAdjacentRooms() {
         return adjacentRooms;
+    }
+
+    String getDirectionTo(String roomId) {
+        if (adjacentRooms.containsKey(roomId)) {
+            return adjacentRooms.get(roomId);
+        }
+        else {
+            return "Room " + roomId + "is not adjacent to " + name + ".";
+        }
+    }
+
+    boolean containsItems() {
+        return items.size() > 0;
+    }
+
+    ArrayList<String> getItems() {
+        return items;
     }
 
     String getId() {
