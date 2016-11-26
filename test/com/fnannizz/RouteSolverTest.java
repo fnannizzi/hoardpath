@@ -72,6 +72,17 @@ public class RouteSolverTest {
 
     }
 
+    @Test
+    public void testSolvingComplexMap() throws Exception {
+        RouteSolver solver = new RouteSolver(testfilesPath + "complex/map.xml");
+        solver.setScenario(testfilesPath + "complex/scenario.txt");
+        String solution = readSolutionFile(testfilesPath + "basic/solution.txt");
+        solver.solve();
+
+        assertEquals(solution.trim(), outputStream.toString().trim());
+
+    }
+
     @After
     public void tearDown() throws Exception {
         // Unset output and error streams before shutting down

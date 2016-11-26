@@ -18,7 +18,7 @@ public class ShortestPathSolver {
     }
 
 
-    public void findShortestPath(ArrayList<String> itemsToCollect, String startLocation) throws InvalidScenarioException {
+    void findShortestPath(ArrayList<String> itemsToCollect, String startLocation) throws InvalidScenarioException {
         ArrayList<String> locationsOfNeededItems = roomMapModel.getLocationsOfNeededItems(itemsToCollect);
         HashMap<String, Room> roomMap = roomMapModel.getRoomMap();
 

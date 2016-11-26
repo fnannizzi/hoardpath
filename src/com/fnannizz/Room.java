@@ -14,10 +14,6 @@ public class Room {
     private ArrayList<String> items;
     private HashMap<String, String> adjacentRooms;
 
-    public Room() {
-        name = "DEAD END";
-    }
-
     public Room(String n, String i) {
         name = n;
         id = i;
