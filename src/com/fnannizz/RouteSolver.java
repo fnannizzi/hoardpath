@@ -41,6 +41,10 @@ public class RouteSolver {
         }
     }
 
+    public void printMap() {
+        map.printMap();
+    }
+
     public void solve() {
 
     }

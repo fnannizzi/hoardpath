@@ -33,11 +33,19 @@ public class RouteSolverTest {
     }
 
     @Test
+    public void testSetMap() throws Exception {
+        RouteSolver solver = new RouteSolver();
+        solver.setMap(testfilesPath + "basic/map.xml");
+        solver.printMap();
+        assertEquals("1 Hallway\n" + "2 Dining Room\n" + "3 Kitchen\n" + "4 Sun Room".trim(), outputStream.toString().trim());
+    }
+
+    @Test
     public void testSetScenario() throws Exception {
         RouteSolver solver = new RouteSolver();
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         solver.printItemsToCollect();
-        assertEquals("potted plant\nknife".trim(), outputStream.toString().trim());
+        assertEquals("potted plant\n" + "knife".trim(), outputStream.toString().trim());
     }
 
     @Test

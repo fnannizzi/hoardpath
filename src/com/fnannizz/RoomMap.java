@@ -79,5 +79,11 @@ public class RoomMap {
         }
     }
 
+    public void printMap() {
+        for (Integer key : map.keySet()) {
+            System.out.println(key + " " + map.get(key).getName());
+        }
+    }
+
 
 }
