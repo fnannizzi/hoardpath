@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE map
+[
+    <!ELEMENT map (room*)>
+
+    <!ELEMENT room (object*)>
+    <!ATTLIST room id       ID      #REQUIRED>
+    <!ATTLIST room name     CDATA   #REQUIRED>
+    <!ATTLIST room north    IDREF   #IMPLIED>
+    <!ATTLIST room south    IDREF   #IMPLIED>
+    <!ATTLIST room east     IDREF   #IMPLIED>
+    <!ATTLIST room west     IDREF   #IMPLIED>
+
+    <!ELEMENT object (#PCDATA)>
+    <!ATTLIST object name ID #REQUIRED>
+
+]>
+
+<map>
+    <room id="pond" name="Pond" east="dirt-track">
+        <object name="Fishing-rod"/>
+    </room>
+    <room id="dirt-track" name="Dirt Track" west="pond" east="mesa" south="front-yard"/>
+    <room id="mesa" name="Mesa" west="dirt-track" east="foothills"/>
+    <room id="foothills" name="Foothills" west="mesa" south="pine-forest"/>
+
+    <room id="porch" name="Porch" south="hallway" east="front-yard"/>
+    <room id="front-yard" name="Front Yard" west="porch" north="dirt-track" />
+    <room id="scree-slope" name="Scree Slope" south="cave-entrance" east="pine-forest" />
+    <room id="pine-forest" name="Pine Forest" north="foothills" west="scree-slope">
+        <object name="Pine-cone"/>
+    </room>
+
+    <room id="hallway" name="Hallway" north="porch" east="library" south="dining-room" />
+    <room id="library" name="Library" west="hallway" south="secret-passage-west">
+        <object name="Book"/>
+    </room>
+    <room id="cave-entrance" name="Cave Entrance" north="scree-slope" south="secret-passage-east" east="low-tunnel" />
+    <room id="low-tunnel" name="Low Tunnel" west="cave-entrance">
+        <object name="Pickaxe"/>
+    </room>
+
+    <room id="dining-room" name="Dining Room" north="hallway" south="kitchen">
+        <object name="Plate"/>
+    </room>
+    <room id="secret-passage-west" name="Secret Passage (West)" north="library" south="scullery" east="secret-passage-east" />
+    <room id="secret-passage-east" name="Secret Passage (East)" north="cave-entrance" south="huge-cavern" west="secret-passage-west" />
+    <room id="underground-lake" name="Underground Lake" south="narrow-crawl">
+        <object name="Lamp"/>
+    </room>
+
+    <room id="kitchen" name="Kitchen" north="dining-room" east="scullery" />
+    <room id="scullery" name="Scullery" north="secret-passage-west" west="kitchen" />
+    <room id="huge-cavern" name="Huge Cavern" north="secret-passage-east" east="narrow-crawl" />
+    <room id="narrow-crawl" name="Narrow Crawl" north="underground-lake" west="huge-cavern" />
+</map>

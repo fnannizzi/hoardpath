@@ -11,20 +11,26 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by francesca on 11/25/16.
 **/
 
-public class RoomMap {
-    private HashMap<Integer, Room> map;
-    private HashMap<String, Integer> itemLocationsMap;
+class Path {
+    private ArrayList<Integer> path;
+
+    public void addToPath(Integer node) {
+        path.add(node);
+    }
+}
+
+class RoomMap {
+    private HashMap<String, Room> roomMap;
+    private HashMap<String, String> itemLocationsMap;
     static private HashMap<String, Integer> directionsMap;
 
-    public RoomMap(String mapFilePath) {
+    RoomMap(String mapFilePath) {
         directionsMap = new HashMap<String, Integer>() {{
             put("north", 0);
             put("east",  1);
@@ -32,7 +38,7 @@ public class RoomMap {
             put("west",  3);
         }};
         itemLocationsMap = new HashMap<>();
-        map = new HashMap<>();
+        roomMap = new HashMap<>();
 
         try {
             parseXML(mapFilePath);
@@ -43,8 +49,57 @@ public class RoomMap {
         }
     }
 
+    // Called only when asked to reset the scenario
+    void clearItemLocations() {
+        itemLocationsMap.clear();
+    }
+
+    Integer getNumberOfRooms() {
+        return roomMap.size();
+    }
+
+    public void findShortestPath(ArrayList<String> itemsToCollect, Integer startNode) throws InvalidScenarioException {
+        ArrayList<String> locationsOfNeededItems = getLocationsOfNeededItems(itemsToCollect);
+
+        // The number of must-visit nodes is the number of nodes containing objects we need, plus the start node if
+        // it isn't already in the list of must-visits
+        Integer numMustVisitNodes;
+        if (locationsOfNeededItems.contains(startNode)) {
+            numMustVisitNodes = locationsOfNeededItems.size();
+        }
+        else {
+            numMustVisitNodes = locationsOfNeededItems.size() + 1;
+        }
+
+        Path[][] shortestPaths = new Path[numMustVisitNodes][numMustVisitNodes];
+
+        for (int start = 0; start < numMustVisitNodes; start++) {
+            for (int end = 0; end < numMustVisitNodes; end++) {
+                if (start == end) {
+                    //shortestPaths[start][end] = ;
+                }
+            }
+        }
 
 
+
+
+    }
+
+    private ArrayList<String> getLocationsOfNeededItems(ArrayList<String> itemsToCollect) throws InvalidScenarioException {
+        ArrayList<String> locationsOfNeededItems = new ArrayList<>();
+        for (String item : itemsToCollect) {
+            if (itemLocationsMap.containsKey(item)) {
+                locationsOfNeededItems.add(itemLocationsMap.get(item));
+            }
+            else {
+                throw new InvalidScenarioException("The item " + item + " does not exist in the given map.");
+            }
+        }
+        return locationsOfNeededItems;
+    }
+
+    // TODO: decide if this should be moved to a separate class
     private void parseXML(String mapFilePath) throws ParserConfigurationException, IOException, SAXException {
         File file = new File(mapFilePath);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -56,32 +111,30 @@ public class RoomMap {
         for (int roomIndex = 0; roomIndex < roomList.getLength(); roomIndex++) {
             if (roomList.item(roomIndex).getNodeType() == Node.ELEMENT_NODE) {
                 Element current = (Element) roomList.item(roomIndex);
-                Room newRoom = new Room(current.getAttribute("name"), new Integer(current.getAttribute("id")));
+                Room newRoom = new Room(current.getAttribute("name"), current.getAttribute("id"));
 
                 // Add all the objects to the room
                 NodeList objectList = current.getElementsByTagName("object");
                 for (int objectIndex = 0; objectIndex < objectList.getLength(); objectIndex++) {
                     String itemName = ((Element) objectList.item(objectIndex)).getAttribute("name");
                     newRoom.addItemToRoom(itemName);
-                    itemLocationsMap.put(itemName, newRoom.getId());
+                    itemLocationsMap.put(itemName.toLowerCase(), newRoom.getId());
                 }
 
                 // Add all connecting rooms
                 for (String direction : directionsMap.keySet()) {
                     if (!Objects.equals(current.getAttribute(direction),"")) {
-                        Integer i = new Integer(current.getAttribute(direction));
-                        Integer dir = new Integer(directionsMap.get(direction));
-                        newRoom.addConnectingRoom(dir, i);
+                        newRoom.addConnectingRoom(new Integer(directionsMap.get(direction)), current.getAttribute(direction));
                     }
                 }
-                map.put(newRoom.getId(), newRoom);
+                roomMap.put(newRoom.getId(), newRoom);
             }
         }
     }
 
-    public void printMap() {
-        for (Integer key : map.keySet()) {
-            System.out.println(key + " " + map.get(key).getName());
+    void printMap() {
+        for (String key : roomMap.keySet()) {
+            System.out.println(key + " " + roomMap.get(key).getName());
         }
     }
 

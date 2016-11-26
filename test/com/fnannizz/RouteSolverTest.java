@@ -34,24 +34,36 @@ public class RouteSolverTest {
 
     @Test
     public void testSetMap() throws Exception {
-        RouteSolver solver = new RouteSolver();
-        solver.setMap(testfilesPath + "basic/map.xml");
+        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
         solver.printMap();
         assertEquals("1 Hallway\n" + "2 Dining Room\n" + "3 Kitchen\n" + "4 Sun Room".trim(), outputStream.toString().trim());
     }
 
     @Test
     public void testSetScenario() throws Exception {
-        RouteSolver solver = new RouteSolver();
+        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         solver.printItemsToCollect();
         assertEquals("potted plant\n" + "knife".trim(), outputStream.toString().trim());
     }
 
+    @Test(expected = InvalidScenarioException.class)
+    public void testSetScenarioExtraItem() throws Exception {
+        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        solver.setScenario(testfilesPath + "basic/scenario_extra_item.txt");
+        solver.solve();
+    }
+
+    @Test(expected = InvalidScenarioException.class)
+    public void testSetScenarioEmpty() throws Exception {
+        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        solver.setScenario(testfilesPath + "basic/scenario_empty.txt");
+        solver.solve();
+    }
+
     @Test
     public void testSolvingBasicMap() throws Exception {
-        RouteSolver solver = new RouteSolver();
-        solver.setMap(testfilesPath + "basic/map.xml");
+        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         String solution = readSolutionFile(testfilesPath + "basic/solution.txt");
         solver.solve();

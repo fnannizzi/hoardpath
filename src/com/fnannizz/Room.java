@@ -9,44 +9,40 @@ public class Room {
     private static final int NUM_CONNECTIONS = 4;
 
     private String name;
-    private Integer id;
+    private String id;
     private ArrayList<String> items;
-    private ArrayList<Integer> adjacentRooms;
+    private ArrayList<String> adjacentRooms;
 
     public Room() {
         name = "DEAD END";
     }
 
-    public Room(String n, Integer i) {
+    public Room(String n, String i) {
         name = n;
         id = i;
 
         items = new ArrayList<>();
-        adjacentRooms = new ArrayList<Integer>() {{
-            add(-1);
-            add(-1);
-            add(-1);
-            add(-1);
+        adjacentRooms = new ArrayList<String>() {{
+            add("");
+            add("");
+            add("");
+            add("");
         }};
     }
 
-    public void addItemToRoom(String itemName) {
+    void addItemToRoom(String itemName) {
         items.add(itemName);
     }
 
-    public void addConnectingRoom(Integer directionIndex, Integer roomIndex) {
-        adjacentRooms.set(directionIndex, roomIndex);
+    void addConnectingRoom(Integer directionIndex, String roomId) {
+        adjacentRooms.set(directionIndex, roomId);
     }
 
-    public Integer getId() {
+    String getId() {
         return id;
     }
 
-    public String getName() {
+    String getName() {
         return name;
-    }
-
-    public boolean doesRoomContainItem(String itemName) {
-        return items.contains(itemName);
     }
 }
