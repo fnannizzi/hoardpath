@@ -12,14 +12,15 @@ import java.nio.file.Paths;
 import static org.junit.Assert.*;
 
 /**
- * Created by francesca on 11/25/16.
+ * Testing interface methods of PathSolver.
  */
-public class RouteSolverTest {
+public class PathSolverTest {
 
     private final String testfilesPath = "./test/com/fnannizz/testfiles/";
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
+    // Used to verify the solution output matches what is expected.
     private String readSolutionFile(String solutionFilePath) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(solutionFilePath));
         return new String(encoded, StandardCharsets.UTF_8);
@@ -27,21 +28,23 @@ public class RouteSolverTest {
 
     @Before
     public void setUp() throws Exception {
-        // Set output and error streams to capture RouteSolver output
+        // Set output and error streams to capture PathSolver output
         System.setOut(new PrintStream(outputStream));
         System.setErr(new PrintStream(errorStream));
     }
 
     @Test
     public void testSetMap() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
         solver.printMap();
         assertEquals("1 Hallway\n" + "2 Dining Room\n" + "3 Kitchen\n" + "4 Sun Room".trim(), outputStream.toString().trim());
     }
 
     @Test
     public void testSetScenario() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         solver.printItemsToCollect();
         assertEquals("potted plant\n" + "knife".trim(), outputStream.toString().trim());
@@ -49,21 +52,36 @@ public class RouteSolverTest {
 
     @Test(expected = InvalidScenarioException.class)
     public void testSetScenarioExtraItem() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario_extra_item.txt");
         solver.solve();
     }
 
     @Test(expected = InvalidScenarioException.class)
+    public void testSetScenarioBeforeMapInitialized() throws Exception {
+        PathSolver solver = new PathSolver();
+        solver.setScenario(testfilesPath + "basic/scenario.txt");
+    }
+
+    @Test(expected = InvalidScenarioException.class)
+    public void testSetScenarioNoItems() throws Exception {
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
+        solver.setScenario(testfilesPath + "basic/scenario_no_items.txt");
+    }
+
+    @Test(expected = InvalidScenarioException.class)
     public void testSetScenarioEmpty() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario_empty.txt");
-        solver.solve();
     }
 
     @Test
     public void testSolvingBasicMap() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "basic/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "basic/map.xml");
         solver.setScenario(testfilesPath + "basic/scenario.txt");
         String solution = readSolutionFile(testfilesPath + "basic/solution.txt");
         solver.solve();
@@ -73,7 +91,8 @@ public class RouteSolverTest {
 
     @Test
     public void testSolvingComplexMap() throws Exception {
-        RouteSolver solver = new RouteSolver(testfilesPath + "complex/map.xml");
+        PathSolver solver = new PathSolver();
+        solver.initializeWithMap(testfilesPath + "complex/map.xml");
         solver.setScenario(testfilesPath + "complex/scenario.txt");
         String solution = readSolutionFile(testfilesPath + "complex/solution.txt");
         solver.solve();

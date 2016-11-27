@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by francesca on 11/25/16.
+ * Representation of a single room.
  */
-public class Room {
+class Room {
 
     private String name;
     private String id;

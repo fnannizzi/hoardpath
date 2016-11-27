@@ -19,20 +19,11 @@ import java.util.Objects;
  */
 public class MapFactory {
 
-    static RoomGraph makeMap(String mapFilePath) {
-        try {
-            return parseXML(mapFilePath);
-        }
-        catch (IOException e) {
-            System.out.println("Unable to open map.xml: " + e.toString());
-        }
-        catch (ParserConfigurationException | SAXException e) {
-            System.out.println("Error parsing map.xml: " + e.toString());
-        }
-        return new RoomGraph();
+    static MapData makeMap(String mapFilePath) throws ParserConfigurationException, IOException, SAXException {
+        return parseXML(mapFilePath);
     }
 
-     static private RoomGraph parseXML(String mapFilePath) throws ParserConfigurationException, IOException, SAXException {
+     static private MapData parseXML(String mapFilePath) throws ParserConfigurationException, IOException, SAXException {
          HashMap<String, Room> roomMap = new HashMap<>();
          HashMap<String, String> itemLocationsMap = new HashMap<>();
 
@@ -57,7 +48,7 @@ public class MapFactory {
                 }
 
                 // Add all connecting rooms
-                for (String direction : RoomGraph.directions) {
+                for (String direction : MapData.directions) {
                     if (!Objects.equals(current.getAttribute(direction),"")) {
                         newRoom.addConnectingRoom(direction, current.getAttribute(direction));
                     }
@@ -65,6 +56,6 @@ public class MapFactory {
                 roomMap.put(newRoom.getId(), newRoom);
             }
         }
-        return new RoomGraph(roomMap, itemLocationsMap);
+        return new MapData(roomMap, itemLocationsMap);
     }
 }

@@ -20,7 +20,7 @@ public class ShortestPathSolverTest {
 
     @Before
     public void setUp() throws Exception {
-        // Set output and error streams to capture RouteSolver output
+        // Set output and error streams to capture PathSolver output
         System.setOut(new PrintStream(outputStream));
         System.setErr(new PrintStream(errorStream));
     }
@@ -31,7 +31,7 @@ public class ShortestPathSolverTest {
 //            add(1);
 //            add(2);
 //        }};
-//        ShortestPathSolver.computeAllPermutationsOfArray(array, 0, System.out.println(array));
+//        OptimalPathSolver.computeAllPermutationsOfArray(array, 0, System.out.println(array));
 //        assertEquals("[1, 2]\n" + "[2, 1]".trim(), outputStream.toString().trim());
 //    }
 //
@@ -43,7 +43,7 @@ public class ShortestPathSolverTest {
 //            add(3);
 //            add(4);
 //        }};
-//        ShortestPathSolver.computeAllPermutationsOfArray(array, 0);
+//        OptimalPathSolver.computeAllPermutationsOfArray(array, 0);
 //        assertEquals("[1, 2]\n" + "[2, 1]".trim(), outputStream.toString().trim());
 //    }
 
