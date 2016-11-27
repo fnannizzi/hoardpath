@@ -14,7 +14,7 @@ class RouteSolver {
     private String startingLocation;
 
     RouteSolver(String mapFilePath) {
-        roomGraph = new RoomGraph(mapFilePath);
+        roomGraph = MapFactory.makeMap(mapFilePath);
         itemsToCollect = new ArrayList<>();
     }
 
