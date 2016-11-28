@@ -1,39 +1,57 @@
 package com.fnannizz;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * Solves for the optimal path through a map to collect a given list of items. Implements the following algorithm:
- * 1) create a list of must-pass nodes (the start node, and each node that contains an item on the list)
- * 2) find the length of the shortest path between each pair of must-pass nodes using Dijkstra's algorithm
- * 3) for every permutation of the list of must-pass nodes (always beginning with the start node), compute the
+ * 1) create a list of must-visit nodes (the start node, and each node that contains an item on the list)
+ * 2) find the length of the shortest path between each pair of must-visit nodes using Dijkstra's algorithm
+ * 3) for every permutation of the list of must-visit nodes (always beginning with the start node), compute the
  *    total path length to find the shortest path through all the nodes
- * 4) once the optimal the must-pass nodes is found, re-run Dijkstra's for each segment of the path (must-pass node
- *    to must-pass node) and rebuild the optimal path
+ * 4) once the optimal the must-visit nodes is found, rebuild the path by piecing together the path segments
  *
- * There is an important performance trade-off in this implementation of the algorithm. In a sense, it is wasteful to
- * redo the work to compute a path we've already computed once in step 4.
+ * There is an important performance trade-off in this implementation of the algorithm. The memory needed to store
+ * all possible paths as they are determined is considerable - it increases the memory usage by
+ * O(number of must-visit nodes * number of must-visit nodes * length of path between must-visit nodes)
  *
- * memory growth: number of must-pass * number of must-pass * length of path between must-pass nodes
- * time complexity growth: number of must-pass * O(number of edges + number of nodes*log(number of nodes))
+ * I tested this implementation against an alternate implementation which stored only the length of
+ * the path, and thus needed to re-run Dijkstra's to rebuild each path segment after determining which path
+ * was shortest. That implementation requires additional time on the order of
+ * O(number of must-visit nodes * number of edges + number of must-visit nodes * number of nodes * log(number of nodes))
+ *
+ * The performance difference was noticeable even on small graphs, so I have opted for the more memory-intensive but
+ * faster version here.
  */
 class OptimalPathSolver {
 
     private Integer shortestPathLength;
     private ArrayList<PairStringInteger> shortestPath;
-    private Integer[][] shortestPaths;
+    private ShortestPathData[][] shortestPaths;
 
     OptimalPathSolver() {
         shortestPathLength = Integer.MAX_VALUE;
     }
 
+    /**
+     * Main method of OptimalPathSolver, which relies on internal helper methods to compute the shortest path
+     * through a map that collects a certain set of items.
+     */
     void findOptimalPath(MapData mapData, ArrayList<String> neededItems, String startingLocation) throws InvalidScenarioException {
+
+        // Make sure to reset everything if the class is being reused.
+        if (shortestPathLength != Integer.MAX_VALUE) {
+            shortestPathLength = Integer.MAX_VALUE;
+            shortestPath.clear();
+        }
+
+        // Determine the set of must-visit nodes based on the needed items
         ArrayList<String> locationsOfNeededItems = getNeededNodes(mapData, startingLocation, neededItems);
         Integer numMustVisitNodes = locationsOfNeededItems.size();
-        shortestPaths = new Integer[numMustVisitNodes][numMustVisitNodes];
+        shortestPaths = new ShortestPathData[numMustVisitNodes][numMustVisitNodes];
 
+        // Compute the shortest path between every pair of must-visit nodes
         for (int start = 0; start < numMustVisitNodes; start++) {
             String currentStartNode = locationsOfNeededItems.get(start);
 
@@ -41,8 +59,7 @@ class OptimalPathSolver {
 
             // update the shortest paths registry
             for (int end = 0; end < numMustVisitNodes; end++) {
-                String currentEndNode = locationsOfNeededItems.get(end);
-                shortestPaths[start][end] = shortestPathData.getDistance(currentEndNode);
+                shortestPaths[start][end] = shortestPathData;
             }
         }
 
@@ -54,21 +71,26 @@ class OptimalPathSolver {
         for (int i = 0; i < numMustVisitNodes; i++) {
             roomIdsAndLocationIndices.add(new PairStringInteger(locationsOfNeededItems.get(i), i));
         }
-        shortestPathLength = Integer.MAX_VALUE;
-        computeAllPermutationsOfArray(roomIdsAndLocationIndices, 1);
+
+        // Find the permutation of must-visit nodes (always beginning with the start node) that
+        // gives the shortest total path.
+        findBestPermutationOfMustVisitNodes(roomIdsAndLocationIndices, 1);
 
         if (shortestPathLength == Integer.MAX_VALUE) {
             System.out.println("Unable to find a path to collect all needed items.");
         }
         else {
-            ArrayList<String> optimalPath = computeBestPath(mapData);
+            // Piece together the optimal path and print it.
+            ArrayList<String> optimalPath = reconstructShortestPath();
             printSolution(mapData, optimalPath, neededItems);
         }
     }
 
+    /**
+     * Determine the list of must-visit nodes - nodes that contain an item on our list of items to collect, or the starting node.
+     */
     private ArrayList<String> getNeededNodes(MapData mapData, String startingLocation, ArrayList<String> neededItems) throws InvalidScenarioException {
         ArrayList<String> locationsOfNeededItems = mapData.getLocationsOfNeededItems(neededItems);
-
 
         // The number of must-visit nodes is the number of nodes containing objects we need, plus the starting node if
         // it isn't already in the list of must-visits. The starting node must be the first node in the list, so
@@ -81,10 +103,29 @@ class OptimalPathSolver {
         return locationsOfNeededItems;
     }
 
+    /**
+     * Run through every permutation of the list of must-visit nodes (always beginning with the starting node)
+     * and update the shortest path tracking variables if a new shortest path is found.
+     */
+    private void findBestPermutationOfMustVisitNodes(ArrayList<PairStringInteger> array, Integer index){
+        if (Objects.equals(index, array.size())) {
+            computePathLength(array);
+            return;
+        }
+        for (int j = index; j < array.size(); j++) {
+            Collections.swap(array, index, j);
+            findBestPermutationOfMustVisitNodes(array, index + 1);
+            Collections.swap(array, index, j);
+        }
+    }
+
+    /**
+     * Compute the path length for a given permutation.
+     */
     private void computePathLength(ArrayList<PairStringInteger> roomIds) {
         Integer pathLength = 0;
         for (int i = 1; i < roomIds.size(); i++) {
-            pathLength += shortestPaths[roomIds.get(i-1).getInteger()][roomIds.get(i).getInteger()];
+            pathLength += shortestPaths[roomIds.get(i-1).getInteger()][roomIds.get(i).getInteger()].getDistance(roomIds.get(i).getStr());
         }
         if (pathLength < shortestPathLength) {
             shortestPathLength = pathLength;
@@ -92,19 +133,10 @@ class OptimalPathSolver {
         }
     }
 
-    private void computeAllPermutationsOfArray(ArrayList<PairStringInteger> array, Integer index){
-        if (Objects.equals(index, array.size())) {
-            computePathLength(array);
-            return;
-        }
-        for (int j = index; j < array.size(); j++) {
-            Collections.swap(array, index, j);
-            computeAllPermutationsOfArray(array, index + 1);
-            Collections.swap(array, index, j);
-        }
-    }
-
-    private ArrayList<String> computeBestPath(MapData mapData) {
+    /**
+     * Piece together the optimal path from path segments stored in the shortestPaths matrix.
+     */
+    private ArrayList<String> reconstructShortestPath() {
         Integer beginSectionIndex = shortestPath.size() - 2;
         Integer endSectionIndex = shortestPath.size() - 1;
         ArrayList<String> path = new ArrayList<>();
@@ -115,7 +147,7 @@ class OptimalPathSolver {
             // Rerunning this algorithm repeatedly is expensive, but the extra time cost outweighs
             // the huge memory cost of storing all the potential paths. Instead of trying to keep
             // this information in memory, we rebuild the paths between critical nodes.
-            ShortestPathData shortestPathData = ShortestPathSolver.findShortestPathFromNode(beginSectionNode, mapData.roomMap);
+            ShortestPathData shortestPathData = shortestPaths[shortestPath.get(beginSectionIndex).getInteger()][shortestPath.get(endSectionIndex).getInteger()];
             while (!Objects.equals(endSectionNode, beginSectionNode)) {
                 path.add(endSectionNode);
                 endSectionNode = shortestPathData.getPrevious(endSectionNode);
@@ -131,6 +163,9 @@ class OptimalPathSolver {
         return path;
     }
 
+    /**
+     * Print the optimal path with directions and item updates.
+     */
     private void printSolution(MapData mapData, ArrayList<String> path, ArrayList<String> neededItems) {
         System.out.println("Found an optimal path of length " + shortestPathLength + ".");
         System.out.println("-------------------------------------------------");
@@ -157,26 +192,3 @@ class OptimalPathSolver {
     }
 }
 
-// Used to implement a priority queue with integer priority values, as well as grouping
-// string room ids to their numeric array index.
-class PairStringInteger implements Comparable<PairStringInteger> {
-    private String string;
-    private Integer integer;
-
-    PairStringInteger(String s, Integer i) {
-        string = s;
-        integer = i;
-    }
-
-    String getStr() {
-        return string;
-    }
-
-    Integer getInteger() {
-        return integer;
-    }
-
-    @Override public int compareTo(PairStringInteger other) {
-        return Integer.compare(this.integer, other.integer);
-    }
-}
